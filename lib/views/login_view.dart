@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first_again_again/constants/routes.dart';
+import 'package:first_again_again/utilities/show_error_dialog.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
@@ -53,17 +54,24 @@ class _LoginViewState extends State<LoginView> {
               final password = _password.text;
 
               try {
-                await FirebaseAuth.instance
-                    .signInWithEmailAndPassword(
-                      email: email,
-                      password: password,
-                    );
+                await FirebaseAuth.instance.signInWithEmailAndPassword(
+                  email: email,
+                  password: password,
+                );
 
                 Navigator.of(
                   context,
                 ).pushNamedAndRemoveUntil(notesRoute, (route) => false);
               } on FirebaseAuthException catch (e) {
-                devtools.log(e.code);
+                if(e.code == 'user-not-found'){
+                  await showErrorDialog(context, "User Not Found");
+                } else if (e.code == 'wrong-password'){
+                  await showErrorDialog(context, "Wrong password");
+                } else if (e.code == 'invalid-credential'){
+                  await showErrorDialog(context, "Invalid credentials");
+                } else {
+                  await showErrorDialog(context, "Error: ${e.code}");
+                }
               } catch (e) {
                 devtools.log("Something bad happen while Login");
                 devtools.log(e.runtimeType.toString());

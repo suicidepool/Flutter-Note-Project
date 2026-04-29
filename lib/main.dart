@@ -21,7 +21,7 @@ void main() {
       routes: {
         loginRoute: (context) => const LoginView(),
         registerRoute: (conext) => const RegisterView(),
-        notesRoute: (context) => const NotesView()
+        notesRoute: (context) => const NotesView(),
       },
     ),
   );
@@ -75,12 +75,14 @@ class NotesViewState extends State<NotesView> {
         actions: [
           PopupMenuButton<MenuAction>(
             onSelected: (value) async {
-              switch(value){
+              switch (value) {
                 case MenuAction.logout:
                   final shouldLogout = await showLogOutDialog(context);
-                  if(shouldLogout){
+                  if (shouldLogout) {
                     await FirebaseAuth.instance.signOut();
-                    Navigator.of(context).pushNamedAndRemoveUntil(loginRoute, (route) => false);
+                    Navigator.of(
+                      context,
+                    ).pushNamedAndRemoveUntil(loginRoute, (route) => false);
                   }
                   break;
               }
@@ -105,14 +107,20 @@ Future<bool> showLogOutDialog(BuildContext context) {
         title: const Text("Sign out"),
         content: const Text("Are you sure you want to Log out?"),
         actions: [
-          TextButton(onPressed: () {
-            Navigator.of(context).pop(false);
-          }, child: const Text("Cancel")),
-          TextButton(onPressed: () {
-            Navigator.of(context).pop(true);
-          }, child: const Text("Log out")),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(true);
+            },
+            child: const Text("Log out"),
+          ),
         ],
       );
     },
   ).then((value) => value ?? false);
-} 
+}
