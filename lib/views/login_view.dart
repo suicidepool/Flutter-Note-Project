@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:first_again_again/constants/routes.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer' as devtools show log;
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -29,9 +31,7 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Login"),
-      ),
+      appBar: AppBar(title: const Text("Login")),
       body: Column(
         children: [
           TextField(
@@ -51,18 +51,23 @@ class _LoginViewState extends State<LoginView> {
             onPressed: () async {
               final email = _email.text;
               final password = _password.text;
-      
+
               try {
-                final userCredential = await FirebaseAuth.instance
-                    .signInWithEmailAndPassword(email: email, password: password);
-      
-                print(userCredential);
+                await FirebaseAuth.instance
+                    .signInWithEmailAndPassword(
+                      email: email,
+                      password: password,
+                    );
+
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil(notesRoute, (route) => false);
               } on FirebaseAuthException catch (e) {
-                print(e.code);
+                devtools.log(e.code);
               } catch (e) {
-                print("Something bad happen while Login");
-                print(e.runtimeType);
-                print(e);
+                devtools.log("Something bad happen while Login");
+                devtools.log(e.runtimeType.toString());
+                devtools.log(e.toString());
               }
             },
             child: const Text("Login"),
@@ -71,7 +76,7 @@ class _LoginViewState extends State<LoginView> {
             onPressed: () {
               Navigator.of(
                 context,
-              ).pushNamedAndRemoveUntil("/register/", (route) => false);
+              ).pushNamedAndRemoveUntil(registerRoute, (route) => false);
             },
             child: const Text("Not registered yet? Register here!"),
           ),
