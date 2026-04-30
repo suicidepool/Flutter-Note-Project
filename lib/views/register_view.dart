@@ -1,4 +1,5 @@
 import 'package:first_again_again/constants/routes.dart';
+import 'package:first_again_again/utilities/show_error_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:developer' as devtools show log;
@@ -31,9 +32,7 @@ class _RegisterViewState extends State<RegisterView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Register"),
-      ),
+      appBar: AppBar(title: const Text("Register")),
       body: Column(
         children: [
           TextField(
@@ -53,30 +52,29 @@ class _RegisterViewState extends State<RegisterView> {
             onPressed: () async {
               final email = _email.text;
               final password = _password.text;
-      
+
               try {
-                final userCredential = await FirebaseAuth.instance
-                    .createUserWithEmailAndPassword(
-                      email: email,
-                      password: password,
-                    );
-      
-                devtools.log(userCredential.toString());
+                await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                  email: email,
+                  password: password,
+                );
+                final user = FirebaseAuth.instance.currentUser;
+                await user?.sendEmailVerification();
+                Navigator.of(context).pushNamed(verifyEmailRoute);
               } on FirebaseAuthException catch (e) {
-                devtools.log(e.code);
-                if (e.code == 'weak-password') {
-                  devtools.log("Weak Password");
-                }
+                showErrorDialog(context, "Error: ${e.code}");
               }
             },
             child: const Text("Register"),
           ),
           TextButton(
-            onPressed: (){
-              Navigator.of(context).pushNamedAndRemoveUntil(loginRoute, (route) => false);
+            onPressed: () {
+              Navigator.of(
+                context,
+              ).pushNamedAndRemoveUntil(loginRoute, (route) => false);
             },
             child: const Text("Already registered. Login here!"),
-          )
+          ),
         ],
       ),
     );
